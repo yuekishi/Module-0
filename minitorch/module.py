@@ -32,12 +32,23 @@ class Module:
     def train(self) -> None:
         "Set the mode of this module and all descendent modules to `train`."
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        def train_recursion(module):
+            module.training=True
+            for submodule in module.modules():
+                train_recursion(submodule)
+        train_recursion(self)
+
+        # raise NotImplementedError("Need to implement for Task 0.4")
 
     def eval(self) -> None:
         "Set the mode of this module and all descendent modules to `eval`."
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        def eval_recursion(module):
+            module.training=False
+            for submodule in module.modules():
+                eval_recursion(submodule)
+        eval_recursion(self)
+        # raise NotImplementedError("Need to implement for Task 0.4")
 
     def named_parameters(self) -> Sequence[Tuple[str, Parameter]]:
         """
@@ -48,11 +59,22 @@ class Module:
             The name and `Parameter` of each ancestor parameter.
         """
         # TODO: Implement for Task 0.4.
+        ans=[]
+        def named_parameters_recursion(module,prefix):
+            tmp=prefix + '.' if prefix else ''
+            for name,value in module.__dict__["_parameters"].items():
+                ans.append((tmp+name,value))
+            for name,submodule in module.__dict__["_modules"].items():
+                prefix=tmp+name
+                named_parameters_recursion(submodule,prefix)
+        named_parameters_recursion(self,'')
+        return ans
         raise NotImplementedError("Need to implement for Task 0.4")
 
     def parameters(self) -> Sequence[Parameter]:
         "Enumerate over all the parameters of this module and its descendents."
         # TODO: Implement for Task 0.4.
+        return list(map(lambda x: x[1],self.named_parameters()))
         raise NotImplementedError("Need to implement for Task 0.4")
 
     def add_parameter(self, k: str, v: Any) -> Parameter:
